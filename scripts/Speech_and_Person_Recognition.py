@@ -25,8 +25,8 @@ class SpeechandPersonRecognition:
     def getCrowdSizeCB(self,result):
         self.crowd_list = result.data.split(' ')
         self.crowd_list[-1:] = []
-        self.male_count = crowd_list.count('male')
-        self.female_count = crowd_list.count('female')
+        self.male_count = self.crowd_list.count('male')
+        self.female_count = self.crowd_list.count('female')
         
 
     def startSPR(self):#-----------------state 0
@@ -50,18 +50,12 @@ class SpeechandPersonRecognition:
         #男女認識
         rospy.sleep(3.0)
         self.crowd_list_req_pub.publish(True)
-        while self.male_count * self.female_count < 0 and not rospy.is_shutdown():
+        while (self.male_count < 0 or self.female_count < 0)  and not rospy.is_shutdown():
             print 'getting crowd size'
             rospy.sleep(1.0)
-        voice_cmd = '/usr/bin/picospeaker %s' %'It is'
+        voice_cmd = '/usr/bin/picospeaker %s' %'It is ' + str(self.male_count) + ' male '
         subprocess.call(voice_cmd.strip().split(' '))
-        voice_cmd = '/usr/bin/picospeaker %s' %str(self.male_count)
-        subprocess.call(voice_cmd.strip().split(' '))
-        voice_cmd = '/usr/bin/picospeaker %s' %'male and'
-        subprocess.call(voice_cmd.strip().split(' '))
-        voice_cmd = '/usr/bin/picospeaker %s' %str(self.female_count)
-        subprocess.call(voice_cmd.strip().split(' '))
-        voice_cmd = '/usr/bin/picospeaker %s' %'female.'
+        voice_cmd = '/usr/bin/picospeaker %s' %'and ' + str(self.female_count) + ' female.'
         subprocess.call(voice_cmd.strip().split(' '))
         rospy.sleep(3.0)
         voice_cmd = '/usr/bin/picospeaker %s' %'Who want to play riddles with me?'#オペレータを要求
